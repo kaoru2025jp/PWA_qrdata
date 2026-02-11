@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>計算書</title>
+<style>
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+input, button {
+  margin: 6px 0;
+  width: 100%;
+  max-width: 300px;
+}
+</style>
+</head>
+
+<body>
+<h2>計算書</h2>
+
+B:  <input id="B"  type="number"><br>
+O1: <input id="O1" type="number"><br>
+O2: <input id="O2" type="number"><br>
+T:  <input id="T"  type="number"><br>
+
+<button onclick="calc()">計算して送信</button>
+
+<p>
+結果<br>
+S1 = <span id="s1"></span><br>
+S2 = <span id="s2"></span>
+</p>
+
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzQJChZXlm5xuhFgpyHHiFG3UsBGBIZpuM5wua8LpNWMDKurOa1qFLUkG9Ucjf_1NVNjg/exec";
+
+function calc() {
+  const B  = parseFloat(document.getElementById("B").value);
+  const O1 = parseFloat(document.getElementById("O1").value);
+  const O2 = parseFloat(document.getElementById("O2").value);
+  const T  = parseFloat(document.getElementById("T").value);
+
+  // 計算（式のみ変更）
+  const S1 = (B - O1 * T).toFixed(2);
+  const S2 = (B - O2 * T).toFixed(2);
+
+  // 表示
+  document.getElementById("s1").textContent = S1;
+  document.getElementById("s2").textContent = S2;
+
+  // JSONP送信（構造そのまま）
+  const callbackName = "cb_" + Date.now();
+  window[callbackName] = function(res) {
+    delete window[callbackName];
+  };
+
+  const script = document.createElement("script");
+  script.src =
+    GAS_URL +
+    "?S1=" + encodeURIComponent(S1) +
+    "&S2=" + encodeURIComponent(S2) +
+    "&callback=" + callbackName;
+
+  document.body.appendChild(script);
+}
+</script>
+</body>
+</html>
